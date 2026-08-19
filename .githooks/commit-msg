@@ -1,0 +1,10 @@
+#!/bin/sh
+# Guardrail: reject any AI assistant authorship / co-author trailer in commit
+# messages (Claude, ChatGPT/OpenAI, Copilot, Gemini, Cursor, Codeium, ...).
+# Enable once per clone:  git config core.hooksPath .githooks
+msg_file="$1"
+if grep -Eiq 'co-authored-by:[[:space:]]*(claude|anthropic|openai|chatgpt|gpt-|copilot|gemini|bard|cursor|codeium)|generated with[[:space:]]+(\[?claude|chatgpt|openai|copilot|gemini|cursor|codeium)|noreply@anthropic|anthropic\.com|openai\.com' "$msg_file"; then
+  echo "commit-msg hook: refusing commit — AI assistant attribution detected. Commits must be authored solely by the maintainer." >&2
+  exit 1
+fi
+exit 0

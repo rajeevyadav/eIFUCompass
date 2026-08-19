@@ -1,0 +1,27 @@
+# Internal process artifacts — NEVER commit to this PUBLIC repo.
+# Directives (D-NNN) and reports (R-NNN) hold internal decision-making and must
+# stay local only (same convention as CyberCompass / RegCompass).
+/reports/
+/directives/
+R-[0-9]*.md
+D-[0-9]*.md
+
+# Dependencies / build outputs (installers publish to Releases, never committed)
+/node_modules/
+/www/
+/dist/
+package-lock.json
+
+# Local scratch
+/scratch/
+/notes/
+*.local
+*.local.*
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+desktop.ini
+*~
+.vscode/
+.idea/

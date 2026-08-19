@@ -1,0 +1,61 @@
+{
+  "name": "eifucompass",
+  "productName": "eIFUCompass",
+  "version": "1.0.0",
+  "description": "eIFUCompass — IFU / Labeling / eIFU Compliance Navigator (FDA + EU MDR). Offline desktop wrapper of the same index.html served on the web.",
+  "author": "Rajeev Yadav <rajeevyadav@gmail.com>",
+  "license": "MIT",
+  "private": true,
+  "main": "electron/main.js",
+  "scripts": {
+    "make-www": "node scripts/make-www.js",
+    "start": "npm run make-www && electron .",
+    "dist:win": "npm run make-www && electron-builder --win",
+    "dist:mac": "npm run make-www && electron-builder --mac",
+    "dist:linux": "npm run make-www && electron-builder --linux",
+    "dist": "npm run make-www && electron-builder"
+  },
+  "devDependencies": {
+    "electron": "^31.7.7",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.rajeevyadav.eifucompass",
+    "productName": "eIFUCompass",
+    "copyright": "© 2026 Rajeev Yadav",
+    "files": [
+      "electron/**",
+      "www/**"
+    ],
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "win": {
+      "target": [
+        { "target": "nsis", "arch": ["x64"] },
+        { "target": "portable", "arch": ["x64"] }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowElevation": false,
+      "allowToChangeInstallationDirectory": true,
+      "artifactName": "eIFUCompass-Setup.${ext}"
+    },
+    "portable": {
+      "artifactName": "eIFUCompass-Portable.${ext}"
+    },
+    "mac": {
+      "target": ["dmg"],
+      "category": "public.app-category.medical",
+      "artifactName": "eIFUCompass.${ext}"
+    },
+    "linux": {
+      "target": ["AppImage"],
+      "category": "Utility",
+      "artifactName": "eIFUCompass.${ext}"
+    }
+  }
+}

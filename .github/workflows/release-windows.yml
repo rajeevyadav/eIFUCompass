@@ -1,0 +1,33 @@
+# eIFUCompass — Windows release build.
+# Runs on a version tag (e.g. v1.0.0) and builds the per-user Windows installer
+# (eIFUCompass-Setup.exe) + portable exe, attaching both to the GitHub Release as
+# a draft (publish it from the Releases tab). Uses the built-in GITHUB_TOKEN.
+# NOTE: builds are UNSIGNED; publishing is a manual step (the draft) so unsigned
+# installers are never auto-released without a human action.
+name: Build Windows release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install dependencies
+        run: npm install
+      - name: Assemble www/
+        run: npm run make-www
+      - name: Build and publish Windows exe
+        run: npx electron-builder --win --publish always
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

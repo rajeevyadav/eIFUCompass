@@ -1,0 +1,43 @@
+# "No embedded AI" guard — eIFUCompass's core promise is that its compliance
+# logic contains no AI/ML code, no copilot/chatbot, and no AI-provider API calls.
+# Fails the build if a future commit introduces one in shipped app/build code.
+# (Docs may talk about AI — the EU AI Act overlay — so only shipped/run files
+# are scanned.) A lightweight guardrail, not a legal certification.
+name: No embedded AI check
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Scan shipped app/build source for AI-provider or AI-assistant references
+        run: |
+          set -e
+          TARGETS="index.html sw.js electron/main.js scripts/make-www.js package.json js/app.js js/rules-eifu.js js/checklist-engine.js js/export.js js/reference.js data/eu-languages.json"
+          PATTERN='openai\.com|anthropic\.com|api\.anthropic|copilot|chatgpt|claude-[a-z0-9-]*\.(js|json)|@anthropic-ai|@openai|langchain|tensorflow|onnxruntime|huggingface'
+          HIT=0
+          for f in $TARGETS; do
+            if [ -f "$f" ] && grep -EinH "$PATTERN" "$f"; then HIT=1; fi
+          done
+          if [ "$HIT" -eq 1 ]; then
+            echo "::error::Found a reference to an AI provider/assistant/ML library in shipped app or build code. eIFUCompass must stay AI-free in its runtime and toolchain."
+            exit 1
+          fi
+          echo "Clean — no embedded AI/ML references found in shipped code."
+
+      - name: Check no AI/ML runtime dependencies were added
+        run: |
+          set -e
+          if [ -f package.json ]; then
+            if grep -Ei '"(openai|@anthropic-ai/[a-z-]*|langchain|@tensorflow/[a-z-]*|onnxruntime-node|@huggingface/[a-z-]*)"[[:space:]]*:' package.json; then
+              echo "::error::An AI/ML package is listed as a dependency in package.json."
+              exit 1
+            fi
+          fi
+          echo "package.json has no AI/ML dependencies."

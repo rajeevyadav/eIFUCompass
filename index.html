@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<!--
+  eIFUCompass — IFU / Labeling / eIFU Compliance Navigator (FDA + EU MDR)
+  Version: 1.0.0
+  Last verified: 2026-08-18
+  Last verified commit: f4dd38c
+  Deterministic, offline, no AI in the compliance logic.
+-->
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#069494">
+<meta name="description" content="eIFUCompass — dual-market (FDA + EU MDR) decision-support tool for IFU/labeling and electronic IFU (eIFU) compliance. Deterministic, offline, no AI in compliance logic. FDA + EU MDR only; no IVDR/IVD, no UK, no combination products.">
+<title>eIFUCompass — IFU / Labeling / eIFU Compliance Navigator</title>
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="pwa-icon-192.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="eIFUCompass">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<header class="top">
+  <div class="top-inner">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 32 32" width="20" height="20" fill="none">
+          <rect x="6" y="4" width="20" height="24" rx="2.5" stroke="#fff" stroke-width="2"/>
+          <line x1="10" y1="11" x2="22" y2="11" stroke="#fff" stroke-width="2"/>
+          <line x1="10" y1="16" x2="22" y2="16" stroke="#fff" stroke-width="2"/>
+          <line x1="10" y1="21" x2="18" y2="21" stroke="#fff" stroke-width="2"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <h1>eIFUCompass</h1>
+        <div class="tagline">IFU / LABELING / eIFU · FDA + EU MDR</div>
+      </div>
+    </div>
+    <div class="disclaimer-box">
+      <strong>Decision-support only.</strong> Not legal/regulatory advice; does not create compliance. <strong>FDA + EU MDR only</strong> — no IVDR/IVD, no UK, no combination products.
+    </div>
+    <button class="theme-btn" id="themeToggle" type="button">🌙 Dark</button>
+  </div>
+</header>
+
+<nav class="market" id="market" aria-label="Market">
+  <button class="active" data-market="fda" type="button">FDA (US)</button>
+  <button data-market="eu" type="button">EU MDR</button>
+  <button data-market="both" type="button">Both + Compare</button>
+</nav>
+
+<main>
+  <div class="panels">
+
+    <!-- ================= LEFT PANEL — Device Profile (Module A) ============ -->
+    <section class="left" aria-label="Device profile">
+
+      <div class="card req-accent">
+        <div class="card-head"><span class="idx">A</span><h3>Device Identification</h3><span class="chev">▾</span></div>
+        <div class="card-body">
+          <div class="field"><label class="lbl" for="fName">Device name / model</label>
+            <input id="fName" type="text" data-field="deviceName" placeholder="e.g. Acme Infusion Pump X1"></div>
+          <div class="field"><label class="lbl" for="fType">Device type</label>
+            <select id="fType" data-field="deviceType" aria-label="Device type">
+              <option value="">— Select —</option>
+              <option value="hardware">Hardware medical device</option>
+              <option value="software">Software / SaMD</option>
+              <option value="implantable">Implantable / active implantable</option>
+              <option value="fixed">Fixed-install device</option>
+              <option value="other">Other</option>
+              <option value="combination" disabled>Combination product (not covered)</option>
+              <option value="ivd" disabled>IVD (not covered)</option>
+            </select>
+            <div class="notice hidden" id="scopeNotice"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card req-accent">
+        <div class="card-head"><span class="idx">B</span><h3>Classification</h3><span class="chev">▾</span></div>
+        <div class="card-body">
+          <div class="grid2">
+            <div class="field"><label class="lbl" for="fEu">EU MDR class</label>
+              <select id="fEu" data-field="euClass">
+                <option value="">— Select —</option>
+                <option>Class I</option><option>Class IIa</option><option>Class IIb</option><option>Class III</option>
+                <option value="unknown">Unknown — run classification first</option>
+              </select></div>
+            <div class="field"><label class="lbl" for="fFda">FDA class / pathway</label>
+              <select id="fFda" data-field="fdaClass">
+                <option value="">— Select —</option>
+                <option>Class I</option><option>Class II</option><option>Class III</option>
+                <option value="unknown">Unknown</option>
+              </select></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card req-accent">
+        <div class="card-head"><span class="idx">C</span><h3>Intended Purpose &amp; Users</h3><span class="chev">▾</span></div>
+        <div class="card-body">
+          <div class="field"><label class="lbl" for="fPurpose">Intended purpose (short)</label>
+            <textarea id="fPurpose" data-field="intendedPurpose" placeholder="Indications, target condition, how the device is used…"></textarea>
+            <div class="hint">A complete intended purpose should state: what the device does · target population/condition · intended users · use environment · indications · contraindications &amp; limitations. These must be consistent between the <b>label</b> and the <b>IFU</b>.</div></div>
+          <div class="grid2">
+            <div class="field"><label class="lbl" for="fUsers">Intended users</label>
+              <select id="fUsers" data-field="intendedUsers">
+                <option value="">— Select —</option>
+                <option value="professional">Professional only</option>
+                <option value="lay">Lay user / patient</option>
+                <option value="both">Both</option>
+                <option value="near-patient">Near-patient</option>
+              </select></div>
+            <div class="field"><label class="lbl" for="fPop">Patient population</label>
+              <select id="fPop" data-field="patientPopulation">
+                <option value="">— Select —</option>
+                <option>Adult</option><option>Pediatric</option><option>Neonate</option><option>Specific / other</option>
+              </select></div>
+          </div>
+          <div class="field"><label class="lbl" for="fEnv">Use environment</label>
+            <select id="fEnv" data-field="useEnvironment">
+              <option value="">— Select —</option>
+              <option value="hospital">Hospital</option>
+              <option value="clinic">Clinic</option>
+              <option value="home">Home</option>
+              <option value="ambulance">Ambulance / pre-hospital</option>
+              <option value="other">Other</option>
+            </select></div>
+          <div class="field"><label class="lbl">Is lay use "reasonably foreseeable"? <span class="hint">(key driver for eIFU eligibility)</span></label>
+            <div class="radios">
+              <label><input type="radio" name="layUse" value="yes" data-field="layUseForeseeable"> Yes</label>
+              <label><input type="radio" name="layUse" value="no" data-field="layUseForeseeable"> No</label>
+              <label><input type="radio" name="layUse" value="uncertain" data-field="layUseForeseeable"> Uncertain</label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><span class="idx">D</span><h3>Device Characteristics</h3><span class="chev">▾</span></div>
+        <div class="card-body">
+          <div class="grid2">
+            <div class="field"><label class="lbl" for="fSterile">Sterile?</label>
+              <select id="fSterile" data-field="sterile"><option value="">— Select —</option><option>Yes</option><option>No</option><option>N/A</option></select></div>
+            <div class="field"><label class="lbl" for="fReuse">Single-use / reusable</label>
+              <select id="fReuse" data-field="reuse"><option value="">— Select —</option><option value="single">Single-use</option><option value="reusable">Reusable</option></select></div>
+          </div>
+          <div class="checks">
+            <label><input type="checkbox" data-field="software"> Contains software / programmable electronic system</label>
+            <label><input type="checkbox" data-field="aiml"> AI / ML enabled</label>
+            <label><input type="checkbox" data-field="implantable"> Implantable / active implantable</label>
+            <label><input type="checkbox" data-field="fixedInstall"> Fixed installed</label>
+            <label><input type="checkbox" data-field="builtInDisplay"> Has built-in display able to show the IFU</label>
+            <label><input type="checkbox" data-field="specialTraining"> Requires special training / qualification</label>
+            <label><input type="checkbox" data-field="udi"> Carries a UDI</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><span class="idx">E</span><h3>eIFU Intent</h3><span class="chev">▾</span></div>
+        <div class="card-body">
+          <div class="field"><label class="lbl">Planned IFU delivery</label>
+            <div class="radios">
+              <label><input type="radio" name="eifu" value="pure" data-field="eifuApproach"> Pure eIFU (no paper)</label>
+              <label><input type="radio" name="eifu" value="hybrid" data-field="eifuApproach"> Hybrid</label>
+              <label><input type="radio" name="eifu" value="paper" data-field="eifuApproach"> Paper only</label>
+            </div>
+          </div>
+          <div class="field"><label class="lbl" for="fWeb">Will a website host the eIFU?</label>
+            <select id="fWeb" data-field="eifuWebsite"><option value="">— Select —</option><option>Yes</option><option>No</option></select></div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn primary" id="evaluate" type="button">Evaluate</button>
+        <button class="btn secondary" id="loadSession" type="button">Load previous</button>
+        <button class="btn ghost" id="reset" type="button">Reset</button>
+      </div>
+    </section>
+
+    <!-- ================= RIGHT PANEL — Results (sticky) ================= -->
+    <aside class="right" aria-label="Results">
+
+      <div class="elig neutral" id="eligBanner">
+        <div class="status"><span class="dot"></span>Complete the device profile</div>
+        <div class="rationale">Set the device profile and the eIFU eligibility decision (EU Reg 2021/2226 as amended by 2025/1234; FDA 21 CFR 801.128) appears here.</div>
+      </div>
+
+      <!-- Dual-market divergence summary — shown only for "Both + Compare" -->
+      <div class="divergence hidden" id="divergence">
+        <h3>EU ↔ FDA divergence</h3>
+        <table class="cmp"><thead><tr><th><span class="sr-only">Dimension</span></th><th>EU MDR</th><th>FDA</th></tr></thead>
+          <tbody id="cmpBody"></tbody></table>
+        <div class="cmp-note" id="cmpNote"></div>
+      </div>
+
+      <!-- eIFU risk-assessment acknowledgment — shown for pure/hybrid eIFU -->
+      <div class="riskack hidden" id="riskAck">
+        <h3>⚠ eIFU risk assessment (2021/2226 Art. 4)</h3>
+        <div class="hint">Pure/hybrid eIFU requires a documented risk assessment. Acknowledge each element is covered:</div>
+        <div class="checks" id="riskAckChecks"></div>
+        <div class="mono riskack-count" id="riskAckCount"></div>
+      </div>
+
+      <div class="meter-card">
+        <div class="meter-top"><span>Profile completeness</span><b id="pct">0%</b></div>
+        <div class="bar"><span id="barFill"></span></div>
+        <div class="hint meter-note">Share of the applicable checklist items (for the selected market) that you've marked as <b>addressed</b>. It stays 0% until you set the device profile and start ticking items in the checklist below.</div>
+      </div>
+
+      <div class="chk-card">
+        <div class="chk-head"><h3>Required content checklist</h3></div>
+        <p class="hint chk-instr">Click an item to mark it <b>addressed</b> — each tick raises the completeness meter above.</p>
+        <div class="chips" id="chips">
+          <span class="chip active" data-f="all">All</span>
+          <span class="chip" data-f="label">Label</span>
+          <span class="chip" data-f="ifu">IFU</span>
+          <span class="chip" data-f="eifu">eIFU</span>
+          <span class="chip" data-f="warn">Warnings</span>
+        </div>
+        <div class="chk-list" id="chkList">
+          <div class="chk-empty">Set the device profile to generate the label / IFU / eIFU checklist (EU MDR Annex I §23, the eIFU Implementing Regulations, FDA 21 CFR 801). Every item shows its exact regulatory reference.</div>
+        </div>
+      </div>
+
+      <div class="gaps hidden" id="gaps">
+        <h3>Critical gaps</h3>
+        <ul id="gapsList"></ul>
+      </div>
+
+      <div class="recs hidden" id="recs">
+        <h3>Recommended next steps</h3>
+        <ul id="recsList"></ul>
+      </div>
+
+      <div class="export-row">
+        <button class="btn primary" id="exportReport" type="button" disabled>Export report</button>
+        <button class="btn secondary" id="exportCsv" type="button" disabled>CSV</button>
+        <button class="btn secondary" onclick="window.print()" type="button">Print</button>
+      </div>
+    </aside>
+
+  </div>
+
+  <!-- Official Sources & References (build-spec Module D) -->
+  <section class="card collapsed src-panel" id="sources">
+    <div class="card-head"><span class="idx">§</span><h3>Official Sources &amp; References</h3><span class="chev">▾</span></div>
+    <div class="card-body">
+      <p class="hint src-intro">The primary sources this tool maps against — EU MDR, the eIFU Implementing Regulations, FDA 21 CFR 801, and the applicable ISO/IEC standards.</p>
+
+      <ul class="src-list first">
+        <li><a href="https://eur-lex.europa.eu/eli/reg/2017/745/oj" target="_blank" rel="noopener">EU MDR (Regulation (EU) 2017/745)</a> — Annex I, Ch. III, §23 (label + IFU)</li>
+        <li><a href="https://eur-lex.europa.eu/eli/reg_impl/2021/2226/oj" target="_blank" rel="noopener">Implementing Reg (EU) 2021/2226</a> — electronic IFU (eIFU)</li>
+        <li><a href="https://eur-lex.europa.eu/eli/reg_impl/2025/1234/oj" target="_blank" rel="noopener">Implementing Reg (EU) 2025/1234</a> — amends 2021/2226 (broadens eIFU to professional-use devices)</li>
+        <li><a href="https://www.ecfr.gov/current/title-21/chapter-I/subchapter-H/part-801" target="_blank" rel="noopener">21 CFR Part 801</a> — FDA device labeling (incl. 801.5, 801.4, 801.109, 801.128)</li>
+        <li><a href="https://www.iso.org/standard/71690.html" target="_blank" rel="noopener">ISO 20417</a> — information supplied by the manufacturer</li>
+        <li><a href="https://www.iso.org/standard/74108.html" target="_blank" rel="noopener">ISO 15223-1</a> — symbols for information supplied</li>
+        <li><a href="https://www.iso.org/standard/72704.html" target="_blank" rel="noopener">ISO 14971</a> — risk management (residual risks in the IFU)</li>
+        <li><a href="https://www.iso.org/standard/63179.html" target="_blank" rel="noopener">IEC 62366-1</a> — usability engineering (IFU as user interface)</li>
+        <li><a href="https://www.iso.org/standard/81720.html" target="_blank" rel="noopener">ISO 17664</a> — information for reprocessing (reusable devices)</li>
+        <li><a href="https://health.ec.europa.eu/medical-devices-sector/new-regulations/guidance-mdcg-endorsed-documents-and-other-guidance_en" target="_blank" rel="noopener">MDCG guidance</a> — incl. 2019-11 (SaMD), 2021-24 (MDSW), 2019-16 (cybersecurity)</li>
+        <li><a href="https://www.fda.gov/medical-devices/overview-device-regulation/device-labeling" target="_blank" rel="noopener">FDA device labeling</a> · patient labeling &amp; human factors guidance</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ISO 15223-1 symbol glossary (browsable reference) -->
+  <section class="card collapsed" id="glossary">
+    <div class="card-head"><span class="idx">⌘</span><h3>ISO 15223-1 symbol glossary</h3><span class="chev">▾</span></div>
+    <div class="card-body">
+      <div class="notice">Symbol graphics are bundled from the open-source (MIT) <a href="https://github.com/t4dhg/medical-device-symbols" target="_blank" rel="noopener">medical-device-symbols</a> library (the manufacturer-facing set for these ISO 15223-1 / ISO 7000 / IEC 60417 symbols). Always use the authoritative symbol, exact title and conditions of use from <b>ISO 15223-1:2021</b>.</div>
+      <div class="sym-grid" id="glossaryBody"></div>
+    </div>
+  </section>
+
+  <!-- EU/EEA language requirements (data-driven, data/eu-languages.json) -->
+  <section class="card collapsed" id="languages">
+    <div class="card-head"><span class="idx">🌐</span><h3>EU / EEA language requirements</h3><span class="chev">▾</span></div>
+    <div class="card-body">
+      <p class="hint src-intro" id="langNote">Member States set their own IFU/label language requirements — confirm the current national rule.</p>
+      <table class="cmp lang-table"><thead><tr><th>Member State</th><th>Official language(s) commonly required</th></tr></thead>
+        <tbody id="langBody"></tbody></table>
+    </div>
+  </section>
+</main>
+
+<button id="toTop" class="to-top" type="button" aria-label="Back to top" title="Back to top">↑</button>
+
+<!-- Print-optimized report (build-spec §6). Hidden on screen; populated on
+     print by app.js and shown via the print stylesheet. -->
+<div id="printReport" class="print-only" aria-hidden="true"></div>
+
+<footer>
+  <div class="foot-inner">
+    <p><strong>eIFUCompass</strong> — decision-support for IFU / labeling / eIFU across <strong>FDA + EU MDR</strong>. No AI in the compliance logic; deterministic, auditable rules. <strong>Not covered:</strong> IVDR / IVD devices, the UK and other jurisdictions, and combination products (21 CFR Part 4 / MDR Art. 117). Provided "as is" — always verify against the official sources (FDA, EUR-Lex, MDCG, EUDAMED, ISO).</p>
+    <p>See also: <a href="https://rajeevyadav.github.io/regcompass/" target="_blank" rel="noopener">RegCompass — FDA &amp; EU MDR regulatory navigator</a> · <a href="https://rajeevyadav.github.io/cybercompass/" target="_blank" rel="noopener">CyberCompass — medtech cybersecurity across 11 jurisdictions</a>.</p>
+    <p class="mono foot-note">© 2026 eIFUCompass · v1.0.0 · offline decision-support · no data collected · always verify against the official sources.</p>
+  </div>
+</footer>
+
+<script src="js/reference.js"></script>
+<script src="js/rules-eifu.js"></script>
+<script src="js/checklist-engine.js"></script>
+<script src="js/export.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
