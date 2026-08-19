@@ -2,6 +2,7 @@
 # AI assistant authorship/co-author trailer (Claude, ChatGPT/OpenAI, Copilot,
 # Gemini, Cursor, Codeium) and (b) any automation-bot author (Renovate,
 # Dependabot, github-actions, or any *[bot] identity). Fails the build on a match.
+# On a pull request it scans EVERY commit the PR adds (base..head), not just the tip.
 name: No AI authorship
 
 on:
@@ -20,12 +21,17 @@ jobs:
       - name: Reject AI / bot authorship and co-author trailers
         run: |
           set -e
+          BASE="${{ github.base_ref }}"
           BEFORE="${{ github.event.before }}"
-          if [ -n "$BEFORE" ] && git rev-parse "$BEFORE" >/dev/null 2>&1; then
-            RANGE="$BEFORE..${{ github.sha }}"
+          if [ -n "$BASE" ]; then
+            git fetch -q origin "$BASE"
+            RANGE="origin/$BASE...HEAD"          # all commits this PR adds
+          elif [ -n "$BEFORE" ] && git rev-parse "$BEFORE" >/dev/null 2>&1; then
+            RANGE="$BEFORE..${{ github.sha }}"    # pushed range
           else
-            RANGE="HEAD~1..HEAD"
+            RANGE="HEAD~1..HEAD"                  # first push / fallback
           fi
+          echo "Scanning commit range: $RANGE"
           # (a) Author/committer must not be an AI assistant/provider identity.
           AI='anthropic\.com|openai\.com|noreply@anthropic|(^|[^a-z])(claude|chatgpt|copilot|codeium|cursor ai)([^a-z]|$)|github-copilot'
           if git log "$RANGE" --format='%an <%ae>%n%cn <%ce>' | grep -Ei "$AI"; then
@@ -38,10 +44,10 @@ jobs:
             echo "::error::A commit is authored by an automation bot. Only the maintainer may author commits."
             exit 1
           fi
-          # (c) No AI co-author / generated-with trailers.
+          # (c) No AI/bot co-author or generated-with trailers.
           TRAILER='co-authored-by:[[:space:]]*(claude|anthropic|openai|chatgpt|gpt-|copilot|gemini|bard|cursor|codeium|renovate|dependabot)|generated with[[:space:]]+(\[?claude|chatgpt|openai|copilot|gemini|cursor|codeium)|noreply@anthropic|anthropic\.com|openai\.com'
           if git log "$RANGE" --format='%B' | grep -Ei "$TRAILER"; then
             echo "::error::A commit carries an AI/bot co-author or generated-with trailer."
             exit 1
           fi
-          echo "Clean — no AI/bot authorship or co-author metadata in the pushed commits."
+          echo "Clean — no AI/bot authorship or co-author metadata in the scanned commits."
