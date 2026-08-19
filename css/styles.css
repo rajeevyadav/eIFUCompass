@@ -253,3 +253,10 @@ footer a{color:var(--text-muted);text-decoration:underline;}
   #printReport ul{margin:4px 0;padding-left:18px;}
   #printReport .layerhdr{font-weight:700;background:#eee;padding:3px 6px;margin-top:6px;}
 }
+
+/* Desktop-app download bar (web/PWA only; hidden in print). */
+.dl-bar{display:flex;align-items:center;flex-wrap:wrap;gap:0.5rem 0.9rem;max-width:1200px;margin:1rem auto;padding:0.7rem 1rem;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-card);}
+.dl-bar .dl-lead{font-weight:700;font-size:0.85rem;}
+.dl-bar .dl-btn{background:var(--primary);color:#fff;text-decoration:none;font-weight:700;font-size:0.82rem;padding:0.45rem 0.9rem;border-radius:8px;white-space:nowrap;}
+.dl-bar .dl-note{font-size:0.7rem;color:var(--text-muted);flex:1 1 240px;line-height:1.4;}
+@media print{ .dl-bar{display:none !important;} }

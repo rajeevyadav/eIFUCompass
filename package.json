@@ -1,7 +1,7 @@
 {
   "name": "eifucompass",
   "productName": "eIFUCompass",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "eIFUCompass — IFU / Labeling / eIFU Compliance Navigator (FDA + EU MDR). Offline desktop wrapper of the same index.html served on the web.",
   "author": "Rajeev Yadav <rajeevyadav@gmail.com>",
   "license": "MIT",
