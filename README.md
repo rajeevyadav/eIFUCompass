@@ -84,6 +84,13 @@ responsibility of the manufacturer. Always verify against the current official
 texts (EU MDR, the Implementing Regulations, FDA regulations and applicable
 standards).
 
+## Family
+
+Part of the same family — same guardrails, same offline-first, no-black-box-AI philosophy:
+[RegCompass](https://rajeevyadav.github.io/regcompass/) ·
+[CyberCompass](https://rajeevyadav.github.io/cybercompass/) ·
+[ClinicalCompass](https://rajeevyadav.github.io/clinicalcompass/).
+
 ## License
 
 MIT — see [`LICENSE`](LICENSE).
