@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!--
   eIFUCompass — IFU / Labeling / eIFU Compliance Navigator (FDA + EU MDR)
-  Version: 1.0.0
+  Version: 1.0.1
   Last verified: 2026-08-18
   Last verified commit: f4dd38c
   Deterministic, offline, no AI in the compliance logic.
@@ -294,11 +294,19 @@
      print by app.js and shown via the print stylesheet. -->
 <div id="printReport" class="print-only" aria-hidden="true"></div>
 
+<!-- Desktop-app download bar. The same page runs in the browser and installs as
+     a PWA; this is the native Windows convenience build. -->
+<div class="dl-bar">
+  <span class="dl-lead">Desktop app</span>
+  <a class="dl-btn" href="https://github.com/rajeevyadav/eifucompass/releases/latest/download/eIFUCompass-Setup.exe">⤓ Download for Windows</a>
+  <span class="dl-note">Per-user installer (no admin needed). Unsigned — on the Windows SmartScreen prompt choose “More info → Run anyway”, and verify the download came from github.com/rajeevyadav/eifucompass. Or just use it in your browser / install as an app.</span>
+</div>
+
 <footer>
   <div class="foot-inner">
     <p><strong>eIFUCompass</strong> — decision-support for IFU / labeling / eIFU across <strong>FDA + EU MDR</strong>. No AI in the compliance logic; deterministic, auditable rules. <strong>Not covered:</strong> IVDR / IVD devices, the UK and other jurisdictions, and combination products (21 CFR Part 4 / MDR Art. 117). Provided "as is" — always verify against the official sources (FDA, EUR-Lex, MDCG, EUDAMED, ISO).</p>
     <p>See also: <a href="https://rajeevyadav.github.io/regcompass/" target="_blank" rel="noopener">RegCompass — FDA &amp; EU MDR regulatory navigator</a> · <a href="https://rajeevyadav.github.io/cybercompass/" target="_blank" rel="noopener">CyberCompass — medtech cybersecurity across 11 jurisdictions</a> · <a href="https://rajeevyadav.github.io/clinicalcompass/" target="_blank" rel="noopener">ClinicalCompass — clinical evaluation &amp; evidence navigator</a>.</p>
-    <p class="mono foot-note">© 2026 eIFUCompass · v1.0.0 · offline decision-support · no data collected · always verify against the official sources.</p>
+    <p class="mono foot-note">© 2026 eIFUCompass · v1.0.1 · offline decision-support · no data collected · always verify against the official sources.</p>
   </div>
 </footer>
 
